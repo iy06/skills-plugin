@@ -24,6 +24,7 @@ claude plugin install skills-plugin@iy06-skills
 | スキル名 | 説明 |
 |---|---|
 | `session-start-hook` | Claude Code on the web 向けのセッション開始フックを作成する |
+| `code-review` | セキュリティ・アーキテクチャ・パフォーマンス・可読性の観点でコードをレビューする |
 
 ## 構造
 
