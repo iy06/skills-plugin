@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "skills-plugin",
+  "description": "iy06's Claude Code skills collection",
+  "author": {
+    "name": "iy06"
+  },
+  "repository": "https://github.com/iy06/skills-plugin",
+  "license": "MIT"
+}
