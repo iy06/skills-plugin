@@ -1,0 +1,4 @@
+interface:
+  display_name: "GUI Event Audit"
+  short_description: "GUIイベントを網羅列挙し層をまたいで実効を追跡、押しても効かない/キャンセルできない/イベント競合などの矛盾を静的に発見するエージェント"
+  default_prompt: "Use $gui-event-audit to GUIの全イベントを列挙し、各イベントの実効を層またぎで末端まで追跡して、押しても効かない・キャンセルできない・イベント競合などの矛盾を在庫表/発見表/カバレッジ表で報告して。"
