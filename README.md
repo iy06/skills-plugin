@@ -30,6 +30,16 @@ claude plugin install skills-plugin@iy06-skills
 | `grill-product` | アプリの要件を定義し、現在の機能と将来欲しい機能を整理した要件定義書を作成する |
 | `gui-event-audit` | GUI のイベントを網羅的に列挙し、各イベントの実効を層をまたいで末端まで追跡して、押しても効かない・キャンセルできない・イベント競合などの矛盾を静的解析で発見する |
 
+## エージェント一覧
+
+開発フローの各フェーズ (要件 → 設計 → 実装) の成果物をレビューする subagent です。プラグインをインストールすると Task ツールの subagent として利用でき、対応するスキルの出力を受けて品質確認する下流工程として機能します。
+
+| エージェント名 | 説明 | 上流スキル |
+|---|---|---|
+| `requirements-review` | 要件定義書 / PRD をルーブリックで検証し、設計フェーズに進んで良いか判定する | `grill-product` |
+| `design-review` | 設計書 / アーキテクチャを検証し、要件との対応マップを作って実装に進んで良いか判定する | `grill-me` |
+| `code-review` | ローカルの作業ブランチ・コミット範囲・ファイル群の実装をレビューする (GitHub PR レビューは `pr-review` スキルが担当) | — |
+
 ## 構造
 
 ```
@@ -37,6 +47,10 @@ skills-plugin/
 ├── .claude-plugin/
 │   ├── plugin.json        # プラグインマニフェスト
 │   └── marketplace.json   # マーケットプレイスカタログ
+├── agents/                # subagent 定義 (ディレクトリ自動検出)
+│   ├── requirements-review.md
+│   ├── design-review.md
+│   └── code-review.md
 └── skills/
     └── session-start-hook/
         └── SKILL.md
@@ -47,6 +61,14 @@ skills-plugin/
 1. `skills/<skill-name>/SKILL.md` を作成する
 2. フロントマターに `description` を記載する
 3. コミット・プッシュする
+
+## エージェントの追加
+
+1. `agents/<agent-name>.md` を作成する
+2. フロントマターに `name` / `description` / `tools` を記載する
+3. コミット・プッシュする
+
+`agents/` 配下は `skills/` と同様にディレクトリごと自動検出されるため、`plugin.json` への明示的な列挙は不要です。
 
 ### SKILL.md の形式
 
