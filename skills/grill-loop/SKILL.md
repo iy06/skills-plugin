@@ -198,7 +198,8 @@ PR をどう扱うか。
 
 ### 図を使う場合：HTML ファイルを書き出してプレビュー
 
-ループの状態遷移（`ready → wip → PR → merged`）などを図で示す場合は、grill 族共通の方針で **自己完結した HTML ファイルに書き出し、ブラウザでプレビュー**する（Mermaid 記法は使わない／**生の HTML をチャットに貼らない**——ターミナルの Claude Code では描画されずタグがそのまま出るため）。`<!DOCTYPE html>` + `<meta charset="utf-8">` の自己完結 HTML を一時ファイル（例 `"${TMPDIR:-/tmp}/grill-loop-<topic>.html"`）に書き出し、既定ブラウザで開く（macOS `open`／Linux `xdg-open`／Windows `start ""`）。チャットにはパスと図の要点だけをテキストで添える。
+ループの状態遷移（`ready → wip → PR → merged`）などを図で示すときは、プラグインルートの
+`shared/diagram-preview.md` の手順に従う（grill 系スキル共通）。
 
 ## Step 8: 起動物の生成
 

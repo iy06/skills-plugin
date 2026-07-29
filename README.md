@@ -42,48 +42,21 @@ claude plugin install skills-plugin@iy06-skills
 | `design-review` | 設計書 / アーキテクチャを検証し、要件との対応マップを作って実装に進んで良いか判定する | `grill-me` |
 | `code-review` | ローカルの作業ブランチ・コミット範囲・ファイル群の実装をレビューする (GitHub PR レビューは `pr-review` スキルが担当) | — |
 
-## 構造
+## 資産を追加・変更するときの約束
 
-```
-skills-plugin/
-├── .claude-plugin/
-│   ├── plugin.json        # プラグインマニフェスト
-│   └── marketplace.json   # マーケットプレイスカタログ
-├── agents/                # subagent 定義 (ディレクトリ自動検出)
-│   ├── requirements-review.md
-│   ├── design-review.md
-│   └── code-review.md
-└── skills/
-    └── session-start-hook/
-        └── SKILL.md
-```
+`skills/` と `agents/` はディレクトリごと自動検出されるため、`plugin.json` への明示的な列挙は
+不要です。以下はこのリポジトリ内で守る規約です。
 
-## スキルの追加
-
-1. `skills/<skill-name>/SKILL.md` を作成する
-2. フロントマターに `description` を記載する
-3. コミット・プッシュする
-
-## エージェントの追加
-
-1. `agents/<agent-name>.md` を作成する
-2. フロントマターに `name` / `description` / `tools` を記載する
-3. コミット・プッシュする
-
-`agents/` 配下は `skills/` と同様にディレクトリごと自動検出されるため、`plugin.json` への明示的な列挙は不要です。
-
-### SKILL.md の形式
-
-```markdown
----
-description: スキルの説明。Claudeがいつ使うかを記述する。
----
-
-# スキルのタイトル
-
-スキルの内容をここに書く。
-```
-
+- **`description` は「担当フェーズ + 成果物 + 隣接資産との境界」で書く。** トリガとなる発話の
+  列挙（「〜と言ったときに必ず使う」）はしない。列挙は網羅できないうえ、同名・近接の資産が
+  他プラグインにも存在するため、選択の判断材料にならない
+- **`name` はディレクトリ名と一致させる。** 参照はすべて `name` 経由で解決される
+- **複数の資産で共有する方針は `shared/` に置き、各資産からは 1 行で参照する。** 同じ指示を
+  コピーすると、変更時に片方だけ古くなる
+  - `shared/diagram-preview.md` — 図の出し方（grill 系スキル共通）
+  - `shared/severity.md` — 指摘の重大度の判定基準（レビュー系スキル / エージェント共通）
+- **SKILL.md が 200 行を超えたら `references/` への分割を検討する。** 本体は「いつ・何を・
+  どの順で」に絞り、詳細な観点カタログや出力仕様は必要になったときだけ読ませる
 
 ## 更新
 
