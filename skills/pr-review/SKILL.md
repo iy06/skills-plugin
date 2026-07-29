@@ -113,21 +113,8 @@ diff の各ハンクについて、読み込んだルールに照らして問題
 
 #### C. 指摘ゼロでも必ずサマリーを残す
 
-問題が見つからなかった場合も、`gh pr comment` で以下のような報告を残す。沈黙は禁止。
-
-```markdown
-## Claude Review
-
-✅ レビューしたルールに違反する箇所は見つかりませんでした。
-
-### 確認したルール
-- `.claude/rules/shared/git-conventions.md`
-- `.claude/rules/backend/coding-style.md`
-- `.claude/rules/backend/security.md`
-
-### 確認したファイル数
-12 files, +234 / -56 lines
-```
+問題が見つからなかった場合も、`gh pr comment` で確認範囲を明示した報告を残す。沈黙は禁止。
+テンプレートは `references/comment-format.md`。
 
 #### D. 同種の指摘は集約する
 
@@ -163,16 +150,8 @@ diff の各ハンクについて、読み込んだルールに照らして問題
 
 ### `.claude/rules/` が存在しない
 
-サマリーコメントで以下を残す：
-
-```markdown
-## Claude Review — セットアップ未完了
-
-このリポジトリには `.claude/rules/` が存在しないため、プロジェクト固有のルールに
-基づくレビューができません。
-
-pr-review skill の examples/rules/ をコピーしてセットアップしてください。
-```
+セットアップ未完了である旨をサマリーコメントで残す（テンプレートは
+`references/comment-format.md`）。
 
 そのうえで、**一般的な観点での簡易レビュー** に切り替える（セキュリティ・明らかなバグ
 のみ）。ルールに基づかない指摘は `[SUGGEST]` ラベルを付け、`[MUST]` は付けない。
@@ -180,14 +159,8 @@ pr-review skill の examples/rules/ をコピーしてセットアップして�
 ### ルールに該当するかどうか曖昧
 
 引用できる根拠がなければ指摘しない。代わりにサマリーの「レビューしきれなかった観点」と
-してメモに残し、ルール追加の検討材料にしてもらう：
-
-```markdown
-### レビューしきれなかった観点
-`apps/api/handlers/user.go` の認可ロジックに気になる点があったが、認可についての
-ルールが `.claude/rules/backend/` に見当たらなかったため指摘を見送った。
-ルール追加を検討してください。
-```
+してメモに残し、ルール追加の検討材料にしてもらう（テンプレートは
+`references/comment-format.md`）。
 
 ---
 
