@@ -1,6 +1,6 @@
 ---
 name: commit-review
-description: ローカルのコミットを、リポジトリの `.claude/rules/` に定義されたプロジェクト固有のルールに基づいてレビューする。pr-review skill と同じルールセットを共有し、`applies_at` メタによって commit 段階で適用すべきルールだけを選別してチェックする。staged な変更、直前のコミット、または push 予定のコミット群に対して、シークレット混入・デバッグログ残骸・コミットメッセージ規約・セキュリティ違反・コーディング規約違反・アーキテクチャ違反などを検知する。「コミットをレビューして」「commit を見て」「push 前にチェックして」「staged を確認して」と頼まれた時、または git の pre-push hook から起動された時には必ずこの skill を使う。明示的に「skill を使え」と言われなくても起動する。
+description: push / commit 前のローカル差分を、`.claude/rules/` のうち `applies_at` が commit 段階を含むルールだけで fail-fast にチェックする。シークレット混入とデバッグ残骸は rules が無くても常に検出し、BLOCK が 1 件でもあれば exit 1 で push を止める。git の pre-push hook からの起動を主な用途として想定。マージ可否の総合判定は pr-review skill が担当する。
 ---
 
 # Commit Review Skill
@@ -252,8 +252,8 @@ PR レビューの `NIT` 相当はコミット時にはノイズになるので 
 ```
 このレビューは commit 段階での fail-fast チェックです。
 PR 作成後、CI で pr-review skill による総合的なレビューが実行されます。
-誤検知や疑問があれば --no-verify でスキップできますが、PR でも同じ指摘が
-出る可能性が高い点に注意してください。
+指摘に納得できない場合は、誤検知として `.claude/rules/` に例外を追記するか、
+ルール自体の見直しを検討してください（同じ指摘は PR でも出る可能性が高いため）。
 ```
 
 ---

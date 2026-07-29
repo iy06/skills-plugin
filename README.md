@@ -24,7 +24,8 @@ claude plugin install skills-plugin@iy06-skills
 | スキル名 | 説明 |
 |---|---|
 | `session-start-hook` | Claude Code on the web 向けのセッション開始フックを作成する |
-| `code-review` | セキュリティ・アーキテクチャ・パフォーマンス・可読性の観点でコードをレビューする |
+| `pr-review` | GitHub の PR を `.claude/rules/` のルールに基づいてレビューし、インラインコメントとサマリーを残す |
+| `commit-review` | push / commit 前のローカル差分を fail-fast でチェックし、BLOCK があれば push を止める |
 | `grill-me` | ユーザーの実装要望を、徹底的な質問と推奨回答の提示を通じて具体化し、実装前に設計書として合意を取る |
 | `grill-you` | 既存コード・機能・概念について調査と解説を行い、追加質問に応じて深掘りすることで理解を深める |
 | `grill-product` | アプリの要件を定義し、現在の機能と将来欲しい機能を整理した要件定義書を作成する |

@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: 実装後のコードレビューを行う。「コードレビューして」「実装をチェック」「PR を出す前に見て」「セルフレビューして」と頼まれた時、または実装作業が一段落して品質確認が必要な時には必ずこのエージェントを使う。ローカルの作業ブランチ・特定のコミット範囲・特定ファイルが対象。GitHub PR レビュー (pr-review skill) は GitHub Actions 側で起動するもので、こちらはローカル / 作業中のコードを対象とする別物。
+description: ローカルの作業ブランチ・コミット範囲・特定ファイルの実装をレビューする。`.claude/rules/` と設計書を参照し、可能なら lint / typecheck / test も実行して、ブロッカー / 改善推奨 / 提案に分類して報告する。実装が一段落して PR を出す前のセルフチェックが主な用途。GitHub 上の PR レビューは pr-review skill、push 直前の fail-fast は commit-review skill が担当する。
 tools: Read, Grep, Glob, Bash
 ---
 

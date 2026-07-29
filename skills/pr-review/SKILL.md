@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: GitHub の Pull Request を、リポジトリの `.claude/rules/` に定義されたプロジェクト固有のルールに基づいてレビューする。コーディング規約・アーキテクチャ・テスト戦略・セキュリティの観点から diff を精査し、個別の問題箇所には GitHub のインラインコメント、全体にはサマリーコメントを残す。「PR をレビューして」「コードレビューして」「review this PR」「PR の指摘をして」と頼まれた時、GitHub Actions の `pull_request` イベントで自動起動された時、`@claude` メンションで PR レビューを依頼された時には必ずこの skill を使う。プロジェクトの規約に従った構造化されたレビューを提供する目的であれば、明示的に「skill を使え」と言われなくても起動する。
+description: GitHub の Pull Request を、リポジトリの `.claude/rules/` に定義されたプロジェクト固有のルールに基づいてレビューし、指摘は GitHub のインラインコメント、全体はサマリーコメントとして GitHub 上に残す。GitHub Actions の pull_request イベント起動、`@claude` メンション、または PR 番号を指定した依頼が対象。push 直前のローカル差分は commit-review skill、手元の作業中コードは code-review エージェントが担当する。
 ---
 
 # PR Review Skill
@@ -81,9 +81,11 @@ diff の各ハンクについて、読み込んだルールに照らして問題
 
 詳細は [コメント投稿の使い分け](#コメント投稿の使い分け) を参照。
 
-すべて投稿し終わったら、**レビュー結果の要約をチャット返答にも書かない**こと
-（GitHub Actions では Claude のテキスト出力は使われない。すべて GitHub 上にコメントとして
-残す）。
+**GitHub Actions 実行時**は、すべて投稿し終わった後、レビュー結果の要約をチャット返答に
+書かない（テキスト出力は破棄されるため、すべて GitHub 上にコメントとして残す）。
+
+**ローカル実行時**は、投稿した内容の要約を端末にも出す。ユーザーは手元で結果を見るため、
+ここで沈黙すると何も伝わらない。
 
 ---
 
@@ -310,5 +312,5 @@ pr-review skill の examples/rules/ をコピーしてセットアップして�
 
 - ルールテンプレ → `examples/rules/_template.md`
 - ルールカタログ雛形 → `examples/rules/README.md`
-- GitHub Actions ワークフロー → `examples/workflows/claude-review.yml`
-- PR テンプレ（改善サイクル用） → `examples/pr_templates/pull_request_template.md`
+- PR テンプレ（改善サイクル用） → `.github/pull_request_template.md`
+- ルール更新用の PR テンプレ → `.github/PULL_REQUEST_TEMPLATE/rule_update.md`
