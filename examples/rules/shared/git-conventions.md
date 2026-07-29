@@ -1,5 +1,5 @@
 ---
-applies_to:
+paths:
   - "**"
 applies_at: [commit, pr]
 priority: medium

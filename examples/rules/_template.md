@@ -1,6 +1,6 @@
 ---
 # このルールが適用されるファイルパターン（glob）
-applies_to:
+paths:
   - "<例: apps/web/**/*.ts>"
   - "<例: apps/web/**/*.tsx>"
 
