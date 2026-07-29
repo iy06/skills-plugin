@@ -17,25 +17,42 @@ skill は PR をレビューするとき、まずこの README を読んでカ�
 
 ## ルール一覧
 
-### shared/（全 PR で必ず確認）
+### shared/（全 PR で確認）
 
-| ファイル | 観点 | 概要 |
-|---|---|---|
-| `shared/git-conventions.md` | コミット規約 | コミットメッセージ、PR タイトルの体裁、変更粒度 |
+| ファイル | 観点 | 適用フェーズ | 概要 |
+|---|---|---|---|
+| `shared/git-conventions.md` | コミット規約 | commit, pr | コミットメッセージ、PR タイトルの体裁、変更粒度 |
+| `shared/testing.md` | テスト | **pr のみ** | テストの有無と質。未完成コミットを止めないため commit では適用しない |
 
 ### frontend/
 
-| ファイル | 観点 | 概要 |
-|---|---|---|
-| `frontend/security.md` | セキュリティ | XSS、CSP、認証情報のクライアント側保持 |
+| ファイル | 観点 | 適用フェーズ | 概要 |
+|---|---|---|---|
+| `frontend/security.md` | セキュリティ | commit, pr | XSS、CSP、認証情報のクライアント側保持 |
 
 ### backend/
 
-| ファイル | 観点 | 概要 |
-|---|---|---|
-| `backend/security.md` | セキュリティ | SQLi、認可、シークレット、入力検証 |
+| ファイル | 観点 | 適用フェーズ | 概要 |
+|---|---|---|---|
+| `backend/security.md` | セキュリティ | commit, pr | SQLi、認可、シークレット、入力検証 |
 
 <!-- ルールを追加するたびにこの表を更新すること -->
+
+## 適用フェーズ（`applies_at`）
+
+同じルールセットを `pr-review`（マージ可否）と `commit-review`（push 前の fail-fast）が共有する。
+どちらで適用するかは各ルールの frontmatter `applies_at` で決まる。
+
+| 値 | 挙動 |
+|---|---|
+| 省略 | `[commit, pr]` とみなす（既定） |
+| `[commit, pr]` | 両方で適用 |
+| `[pr]` | **commit-review はスキップ**。テスト不足など完成度を問うルール向け |
+| `[commit]` | commit-review でのみ適用。コミットメッセージ規約など、PR では意味を持たないもの |
+
+**判断基準:** そのルール違反は「後から直せない事故」か、「完成時に揃っていればよいもの」か。
+前者（シークレット混入、SQL インジェクション）は commit でも止める。後者（テスト、ドキュメント）は
+`[pr]` にする。WIP コミットを止めるルールが増えると fail-fast の仕組み自体が形骸化する。
 
 ## レビュー観点の優先順位
 
@@ -57,7 +74,8 @@ cp .claude/rules/_template.md .claude/rules/backend/architecture.md
 書く際の指針：
 - **❌ 悪い例 / ✅ 良い例を必ず入れる**（Claude の判定精度が大きく上がる）
 - **frontmatter の `applies_to` を正確に書く**
-- **重要度を MUST / SHOULD / NIT で分類する**
+- **`applies_at` で適用フェーズを決める**（上記参照。省略時は `[commit, pr]`）
+- **重要度を MUST / SHOULD / NIT で分類する**（判定基準はプラグインの `shared/severity.md`）
 - **「根拠」セクションに、なぜこのルールが必要かを書く**（半年後の自分への手紙）
 
 ## ルール追加・変更のサイクル

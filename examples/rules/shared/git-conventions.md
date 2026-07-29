@@ -1,6 +1,7 @@
 ---
 applies_to:
   - "**"
+applies_at: [commit, pr]
 priority: medium
 category: coding-style
 ---

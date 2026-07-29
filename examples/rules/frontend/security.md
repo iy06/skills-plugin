@@ -4,6 +4,7 @@ applies_to:
   - "apps/web/**/*.tsx"
   - "apps/web/**/*.js"
   - "apps/web/**/*.jsx"
+applies_at: [commit, pr]
 priority: high
 category: security
 ---

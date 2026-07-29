@@ -4,6 +4,7 @@ applies_to:
   - "apps/api/**/*.ts"
   - "apps/api/**/*.py"
   - "server/**"
+applies_at: [commit, pr]
 priority: high
 category: security
 ---
