@@ -148,67 +148,14 @@ diff の各ハンクについて、読み込んだルールに照らして問題
 
 ## コメント投稿の使い分け
 
-### インラインコメント（特定行への指摘）
+2 系統を使い分ける。テンプレートは `references/comment-format.md` を参照する。
 
-**ツール**: `mcp__github_inline_comment__create_inline_comment`
+| 種類 | ツール | 使う場面 |
+|---|---|---|
+| インライン | `mcp__github_inline_comment__create_inline_comment` | 具体的なコード行への指摘、修正提案 |
+| サマリー | `gh pr comment <PR_NUMBER> --body "..."` | 全体サマリー、確認したルールの記録、設計レベルの懸念 |
 
-**使う場面**:
-- 具体的なコード行に対する指摘
-- 修正提案（suggestion ブロックで具体的な置換を提案できる）
-
-**フォーマット**:
-
-```markdown
-[MUST] `.claude/rules/backend/security.md` の「ユーザー入力は必ず検証する」に違反。
-
-`req.Body` のフィールド `email` がバリデーションされていません。フォーマット検証と
-長さ制限を追加してください。
-
-```go
-// 修正例
-if err := validateEmail(req.Email); err != nil {
-    return badRequest(w, err)
-}
-```
-```
-
-### サマリーコメント（PR 全体への top-level コメント）
-
-**ツール**: `gh pr comment <PR_NUMBER> --body "..."`
-
-**使う場面**:
-- レビュー結果の全体サマリー
-- レビュー対象とした観点・読んだルールの記録
-- 大局的な指摘（設計レベルの懸念）
-
-**フォーマット**:
-
-```markdown
-## Claude Review
-
-<!-- 結果サマリー -->
-- [MUST] 2 件
-- [SHOULD] 3 件
-- [NIT] 1 件
-
-<!-- レビュー範囲の透明性 -->
-### 確認したルール
-- `.claude/rules/shared/git-conventions.md`
-- `.claude/rules/backend/security.md`
-- ...
-
-### 確認したファイル
-`apps/api/handlers/user.go`, `apps/api/repository/user.go`, ...
-
-### 主な懸念
-（あれば、設計レベルの大局的な指摘をここに）
-
----
-
-このレビューは Claude による自動レビューです。誤検知・見落としを見つけたら、
-PR テンプレの「Claude レビューへのフィードバック」欄に記録してください。
-ルール更新のトリガーになります。
-```
+指摘ゼロの場合と、`.claude/rules/` 不在の場合のテンプレートも同ファイルにある。
 
 ---
 
@@ -256,22 +203,6 @@ pr-review skill の examples/rules/ をコピーしてセットアップして�
 
 これにより、人間レビュアーが「Claude が見落とした」「Claude の誤検知だった」を後から
 記録でき、ルール更新の起点になる。
-
----
-
-## 出力例（参考）
-
-完全な実行イメージ：
-
-1. `gh pr view 123 --json files` → `apps/web/src/Login.tsx`, `apps/api/handlers/auth.go` が変更
-2. `.claude/rules/README.md` を読む
-3. `apps/web/**` → `.claude/rules/frontend/*.md` を全部読む
-4. `apps/api/**` → `.claude/rules/backend/*.md` を全部読む
-5. `.claude/rules/shared/*.md` も全部読む
-6. diff を 4 観点（style → architecture → testing → security）で順に見る
-7. 個別問題 3 件 → `mcp__github_inline_comment__create_inline_comment` で各行にコメント
-8. 全体サマリー 1 件 → `gh pr comment` でレビュー結果と確認したルール一覧を投稿
-9. レビュー結果を Claude のチャット返答には書かない
 
 ---
 
