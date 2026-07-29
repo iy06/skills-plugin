@@ -120,28 +120,11 @@ Claude が「もう出し切った、これで実装に入れる」と感じた�
 
 設計書が小さな変更の場合、要件と変更対象だけで完結することもある。テンプレートに縛られず、タスクに合ったボリュームにする。
 
-### 図の記法：HTML ファイルを書き出してプレビュー
+### 図の記法
 
-「処理フロー」など、構造や流れを図で示す場合は **自己完結した HTML ファイルに書き出し、ブラウザでプレビュー**して見せる（Mermaid 記法は使わない／**生の HTML をチャットに貼らない**——ターミナルでは描画されずタグがそのまま出てしまうため）。
-
-1. `<!DOCTYPE html>` + `<meta charset="utf-8">` から始まる自己完結 HTML を組み立てる。`<div>` / `<table>` をインラインスタイルで配置し、ノードを枠線付きボックス、つながりを矢印で表現。失敗・分岐は `background` / `border` / `color` で色分け。外部 CSS / JS や CDN には依存させない。
-2. 一時ファイル（例 `"${TMPDIR:-/tmp}/grill-<topic>.html"`）に書き出す。
-3. 既定ブラウザで開く（macOS `open`／Linux `xdg-open`／Windows `start ""`）。プレビュー系 MCP があればそれでもよい。
-4. チャットには生の HTML を貼らず、ファイルパスと図の要点をテキストで添える。開けない環境ではパスを伝える。
-
-```html
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8"></head>
-<body style="font-family:sans-serif;margin:24px">
-  <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-    <div style="border:2px solid #333;border-radius:8px;padding:10px">入力チェック</div>
-    <div>→</div>
-    <div style="border:2px solid #333;border-radius:8px;padding:10px">本処理</div>
-    <div>→</div>
-    <div style="background:#fdd;border:2px solid #c00;border-radius:8px;padding:10px">エラー時のフォールバック</div>
-  </div>
-</body></html>
-```
+「処理フロー」など構造や流れを図で示すときは、プラグインルートの `shared/diagram-preview.md`
+の手順に従う（自己完結 HTML を一時ファイルに書き出してブラウザで開き、チャットにはパスと
+要点だけを添える）。
 
 ## Step 7: 実装への確認
 
