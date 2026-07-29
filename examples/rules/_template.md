@@ -4,6 +4,12 @@ applies_to:
   - "<例: apps/web/**/*.ts>"
   - "<例: apps/web/**/*.tsx>"
 
+# このルールを適用するフェーズ（省略時は [commit, pr]）
+#   commit — push / commit 前の fail-fast チェック (commit-review skill)
+#   pr     — PR のマージ可否判定 (pr-review skill)
+# 未完成の作業を止めてしまうルール（テスト不足など完成度を問うもの）は [pr] だけにする。
+applies_at: [commit, pr]
+
 # 重要度: high / medium / low
 priority: medium
 
