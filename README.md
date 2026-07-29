@@ -55,6 +55,9 @@ claude plugin install skills-plugin@iy06-skills
   コピーすると、変更時に片方だけ古くなる
   - `shared/diagram-preview.md` — 図の出し方（grill 系スキル共通）
   - `shared/severity.md` — 指摘の重大度の判定基準（レビュー系スキル / エージェント共通）
+  - `shared/debug-residue.md` — デバッグ残骸の既定検出パターン（commit-review の組み込みチェック）
+- **利用者が上書きできる既定値は `shared/` に置き、上書き先と同じスキーマにする。** 既定値を
+  `examples/rules/` に置くと、そこをコピーしていないリポジトリで機能が丸ごと消える
 - **SKILL.md が 200 行を超えたら `references/` への分割を検討する。** 本体は「いつ・何を・
   どの順で」に絞り、詳細な観点カタログや出力仕様は必要になったときだけ読ませる
 

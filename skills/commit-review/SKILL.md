@@ -127,21 +127,11 @@ exit code 0。
 
 #### F. デバッグログ・残骸の検知
 
-以下のパターンを diff から検出し、追加されていれば `[BLOCK]` または `[WARN]`：
+既定の検出パターンは、プラグインルートの `shared/debug-residue.md` を正とする。
+diff に **追加** されたものだけを対象とし、rules の有無にかかわらず実施する。
 
-| パターン | ラベル | 言語 |
-|---|---|---|
-| `console.log`, `console.debug` | WARN | JS/TS |
-| `debugger;` | BLOCK | JS/TS |
-| `print(`, `pprint(`（src 配下） | WARN | Python |
-| `fmt.Println`（main 以外） | WARN | Go |
-| `dump(`, `dd(`, `var_dump(` | BLOCK | PHP/Laravel |
-| `binding.pry`, `byebug` | BLOCK | Ruby |
-| `TODO`, `FIXME`, `XXX`（新規追加分のみ） | WARN | 全言語 |
-| `.only`, `.skip`（テスト） | BLOCK | JS/TS テスト |
-
-これらは rules に書かなくても skill 側でデフォルト検出する。プロジェクトで例外を
-許可したい場合は `.claude/rules/shared/debug-residue.md` を作って上書き可能。
+プロジェクト側に `.claude/rules/shared/debug-residue.md` があれば、そちらを優先する。
+既定と上書き先はスキーマが同じなので、既定ファイルをコピーして必要な行を削るのが早い。
 
 #### G. シークレット混入の検知
 
