@@ -1,5 +1,5 @@
 ---
-applies_to:
+paths:
   - "apps/api/**/*.go"
   - "apps/api/**/*.ts"
   - "apps/api/**/*.py"

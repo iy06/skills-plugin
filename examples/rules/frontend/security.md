@@ -1,5 +1,5 @@
 ---
-applies_to:
+paths:
   - "apps/web/**/*.ts"
   - "apps/web/**/*.tsx"
   - "apps/web/**/*.js"
