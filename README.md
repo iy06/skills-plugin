@@ -19,6 +19,20 @@ Claude Code の `/plugin` コマンドで追加できます：
 claude plugin install skills-plugin@iy06-skills
 ```
 
+### 任意：natural-japanese を併せて入れる
+
+grill 系スキルが書く設計書・要件定義書・ループ設計書・理解メモは、
+[natural-japanese](https://github.com/coji/natural-japanese)（MIT, coji 作）が入っていれば
+提示・保存の直前にそれを通し、冗長な言い回しやリズムの単調さを機械的に検出して直す。
+
+```bash
+claude plugin marketplace add coji/natural-japanese
+claude plugin install natural-japanese@natural-japanese
+```
+
+`uv` が要る（`scripts/lint.py` の実行に使う）。**入れなくてもこのプラグインは動く** —
+未インストールなら各スキルは素のまま書く。方針は `shared/japanese-style.md` を参照。
+
 ## スキル一覧
 
 | スキル名 | 説明 |
@@ -54,6 +68,7 @@ claude plugin install skills-plugin@iy06-skills
 - **複数の資産で共有する方針は `shared/` に置き、各資産からは 1 行で参照する。** 同じ指示を
   コピーすると、変更時に片方だけ古くなる
   - `shared/diagram-preview.md` — 図の出し方（grill 系スキル共通）
+  - `shared/japanese-style.md` — 散文の成果物の文体（grill 系スキル共通、natural-japanese に委譲）
   - `shared/severity.md` — 指摘の重大度の判定基準（レビュー系スキル / エージェント共通）
   - `shared/debug-residue.md` — デバッグ残骸の既定検出パターン（commit-review の組み込みチェック）
 - **利用者が上書きできる既定値は `shared/` に置き、上書き先と同じスキーマにする。** 既定値を
