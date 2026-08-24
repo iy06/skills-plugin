@@ -33,6 +33,34 @@ claude plugin install natural-japanese@natural-japanese
 `uv` が要る（`scripts/lint.py` の実行に使う）。**入れなくてもこのプラグインは動く** —
 未インストールなら各スキルは素のまま書く。方針は `shared/japanese-style.md` を参照。
 
+
+## 規約（rules）を端末間で共有する
+
+`~/.claude/rules/*.md` はハーネスが毎セッション自動で読み込むが、**その場所は端末ローカルで
+同期されない。** このリポジトリの `rules/` を symlink すると、`git pull` だけで全端末に規約が
+行き渡る。
+
+```bash
+git clone https://github.com/iy06/skills-plugin.git ~/skills-plugin
+mv ~/.claude/rules ~/.claude/rules.backup    # 既存があれば退避
+ln -s ~/skills-plugin/rules ~/.claude/rules
+```
+
+**プラグイン更新（`claude plugin update`）とは別系統。** プラグインのキャッシュはコミット SHA を
+含むパスに展開されるため symlink 先にできない。同じリポジトリを「プラグインの供給元」と
+「rules の供給元」の二役で使う。clone したブランチの内容がそのまま効く点に注意。
+
+### rules に置くもの・置かないもの
+
+| | 置き場 | 判断 |
+|---|---|---|
+| どのリポジトリでも成り立つ | `rules/<name>.md` | frontmatter なし = 常時読み込み |
+| 特定の言語・ツールでのみ成り立つ | `rules/<name>.md` | `paths:` frontmatter で絞る |
+| 固有名詞や構成に依存する | Claude Code のメモリ | リポジトリ単位で自動読み込み |
+
+**このリポジトリは公開されている。** リポジトリ名・ホスト名・内部の固有名詞を rules に書かない。
+それらはメモリ側か Vault 側に置く。
+
 ## スキル一覧
 
 | スキル名 | 説明 |
