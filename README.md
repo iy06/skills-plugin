@@ -45,6 +45,7 @@ claude plugin install natural-japanese@natural-japanese
 | `grill-product` | アプリの要件を定義し、現在の機能と将来欲しい機能を整理した要件定義書を作成する |
 | `grill-loop` | 自律・並列のエージェント開発を「どう回し続けるか」を質問駆動で設計し、ループ設計書と起動物 (ラベル定義・起票雛形・consumer スクリプト・routine prompt・緊急停止手順) を生成する |
 | `gui-event-audit` | GUI のイベントを網羅的に列挙し、各イベントの実効を層をまたいで末端まで追跡して、押しても効かない・キャンセルできない・イベント競合などの矛盾を静的解析で発見する |
+| `vault-save` | 確定した成果物を Obsidian Vault に Markdown として保存する。保存先の Vault とフォルダの判断を一手に持ち、grill 系スキルの保存フックから呼ばれる |
 
 ## エージェント一覧
 
@@ -69,6 +70,7 @@ claude plugin install natural-japanese@natural-japanese
   コピーすると、変更時に片方だけ古くなる
   - `shared/diagram-preview.md` — 図の出し方（grill 系スキル共通）
   - `shared/japanese-style.md` — 散文の成果物の文体（grill 系スキル共通、natural-japanese に委譲）
+  - `shared/vault-save-hook.md` — 成果物の Vault 保存を提案するときの約束（grill 系スキル共通、vault-save に委譲）
   - `shared/severity.md` — 指摘の重大度の判定基準（レビュー系スキル / エージェント共通）
   - `shared/debug-residue.md` — デバッグ残骸の既定検出パターン（commit-review の組み込みチェック）
 - **利用者が上書きできる既定値は `shared/` に置き、上書き先と同じスキーマにする。** 既定値を
