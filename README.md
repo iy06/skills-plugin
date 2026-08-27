@@ -83,7 +83,7 @@ ln -s ~/skills-plugin/rules ~/.claude/rules
 |---|---|---|
 | `requirements-review` | 要件定義書 / PRD をルーブリックで検証し、設計フェーズに進んで良いか判定する | `grill-product` |
 | `design-review` | 設計書 / アーキテクチャを検証し、要件との対応マップを作って実装に進んで良いか判定する | `grill-me` |
-| `code-review` | ローカルの作業ブランチ・コミット範囲・ファイル群の実装をレビューする (GitHub PR レビューは `pr-review` スキルが担当) | — |
+| `code-review` | 設計との対応マップを作りながらローカルの実装をレビューし、PR を出して良いか判定する (GitHub PR レビューは `pr-review` スキルが担当) | `grill-me` |
 
 ## 資産を追加・変更するときの約束
 
