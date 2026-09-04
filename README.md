@@ -96,7 +96,9 @@ ln -s ~/skills-plugin/rules ~/.claude/rules
 - **`name` はディレクトリ名と一致させる。** 参照はすべて `name` 経由で解決される
 - **複数の資産で共有する方針は `shared/` に置き、各資産からは 1 行で参照する。** 同じ指示を
   コピーすると、変更時に片方だけ古くなる
-  - `shared/diagram-preview.md` — 図の出し方（grill 系スキル共通）
+  - `shared/diagram-preview.md` — 図の出し方と図解 HTML のデザインの決まり（grill 系スキル共通）
+  - `shared/diagram-style.css` — 図解 HTML のトークンと部品の CSS（生成する HTML に貼り込む唯一の源）
+  - `shared/diagram-kit.html` — 図解の部品の見本と雛形（ブラウザで開けば一覧、生成時はここから写す）
   - `shared/japanese-style.md` — 散文の成果物の文体（grill 系スキル共通、natural-japanese に委譲）
   - `shared/vault-save-hook.md` — 成果物の Vault 保存を提案するときの約束（grill 系スキル共通、vault-save に委譲）
   - `shared/severity.md` — 指摘の重大度の判定基準（レビュー系スキル / エージェント共通）
