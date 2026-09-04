@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>図解の部品一覧</title>
+<!-- 見本用に相対参照している。生成する HTML では <style> に diagram-style.css の中身をそのまま貼る -->
+<link rel="stylesheet" href="diagram-style.css">
+</head>
+<body>
+<div class="page">
+
+<p class="eyebrow">grill 系スキル共通</p>
+<h1>図解の部品一覧</h1>
+<p class="meta"><span>スタイル: <code>shared/diagram-style.css</code></span><span>規則: <code>shared/diagram-preview.md</code></span></p>
+<p>構造の種類ごとに既定の部品を 1 つずつ置いている。題材は「JWT 認証ミドルウェアの設計書」。生成するときはこのファイルの該当ブロックを写し、内容だけ差し替える。</p>
+
+<!-- ============================================================ 1. 文章 -->
+<section>
+<p class="eyebrow">1</p>
+<h2>文章</h2>
+<p class="lede">識別子は <code>code</code>、それ以外の英単語（製品名・概念名）は <i>italic</i>。用語は初出で短い言い換えを添える。</p>
+
+<h2 style="font-size:1.1rem">要件</h2>
+<ul>
+  <li>すべての <code>/api/*</code> エンドポイントで、<code>Authorization: Bearer</code> ヘッダの <i>JWT</i> を検証する</li>
+  <li>ログアウト済みトークンは、期限内でも拒否する（<i>denylist</i> を <i>Redis</i> に置く）</li>
+  <li>検証済みのクレーム（トークンに入っている項目）をハンドラに <code>req.user</code> として渡す</li>
+  <li>スコープ外: リフレッシュトークンの回転、外部 <i>IdP</i> との連携</li>
+</ul>
+<div class="callout"><span class="h">備考</span><i>denylist</i> の TTL 単位が <i>Auth</i> サービスと設定ファイルで食い違っている。実装前に秒へ統一する。</div>
+</section>
+
+<!-- ============================================================ 2. 処理の流れ -->
+<section>
+<p class="eyebrow">2</p>
+<h2>処理の流れ</h2>
+<p class="lede">既定は横並び（5 ステップまで）。番号は自動で付く。箱の注記は「・」の箇条書きで 1 行 9 文字まで。進む条件は <code>data-l</code>（3 文字まで）、抜ける分岐は <code>.vdrop</code> で下に落とし、合流先を <code>.end</code> に置く。</p>
+<!-- 列数は .flowgrid（5 列）/ .flowgrid.n4 / .flowgrid.n3。.vdrop と .end は style="grid-column:…" で列を指定する -->
+<figure><div class="fig">
+<div class="flowgrid">
+  <div class="box step"><span class="t">リクエスト受信</span><ul class="notes"><li><i>Gateway</i> 経由</li><li><code>/api/*</code> が対象</li></ul><span class="arw"></span></div>
+  <div class="box step"><span class="t">ヘッダ抽出</span><ul class="notes"><li><code>Bearer</code> を取る</li><li>無ければ 401</li></ul><span class="arw"></span></div>
+  <div class="box step hl"><span class="t">署名検証</span><ul class="notes"><li>RS256 の署名</li><li><code>exp</code> と <code>iat</code></li></ul><span class="arw" data-l="有効"></span></div>
+  <div class="box step hl"><span class="t">denylist 照会</span><ul class="notes"><li><i>Redis</i> を GET</li><li>TTL は残り秒</li></ul><span class="arw" data-l="未登録"></span></div>
+  <div class="box step"><span class="t">ハンドラへ</span><ul class="notes"><li><code>req.user</code> へ</li><li>署名は見ない</li></ul></div>
+  <div class="vdrop" style="grid-column:3"><span class="tag ng">無効</span></div>
+  <div class="vdrop" style="grid-column:4"><span class="tag ng">登録済み</span></div>
+  <div class="box end ng" style="grid-column:3/5"><span class="t">401 Unauthorized</span><span class="m"><code>WWW-Authenticate: Bearer</code> を付けて終了</span></div>
+</div>
+</div><figcaption>番号が処理順。3 と 4 のどちらで落ちても同じ 401 に合流する。色の付いた枠が今回つくる部分。</figcaption></figure>
+
+<h3>6 ステップ以上、または補足が長いとき: 縦レール</h3>
+<figure><div class="fig">
+<ol class="rail">
+  <li><span class="t">リクエスト受信</span><div class="m">API Gateway が <code>/api/*</code> をそのまま転送する</div></li>
+  <li><span class="t">ヘッダ抽出</span><div class="m"><code>Authorization: Bearer &lt;token&gt;</code> から token を取り出す</div>
+    <div class="branch">ヘッダが無い、または形式が違う → 401 で終了</div></li>
+  <li class="hl"><span class="t">署名検証</span><div class="m">公開鍵で RS256 を検証し、<code>exp</code> と <code>iat</code> を確認する</div>
+    <div class="branch">署名不一致、または期限切れ → 401 で終了</div></li>
+  <li><span class="t">ハンドラへ</span><div class="m">クレームを <code>req.user</code> に載せて次へ渡す</div>
+    <div class="branch ok">ここから先のハンドラは署名を意識しない</div></li>
+</ol>
+</div><figcaption>番号が処理順。赤い注記がそのステップで抜ける分岐。</figcaption></figure>
+</section>
+
+<!-- ============================================================ 3. 差分マップ -->
+<section>
+<p class="eyebrow">3</p>
+<h2>経路と差分マップ</h2>
+<p class="lede">左が経路（上から下）、中央が「ある」（＋）、右が「無い」（−）。不整合は右列に <code>.warn</code>（!）。該当なしは <code>.empty</code> に —。列見出しの語は内容に合わせて選ぶ（ある / 無い、実装済み / 未実装、現状 / 追加、一致 / 不一致）。</p>
+<!-- 1 行 = .n（ノード）+ .c.ok + .c.ng の 3 セル。最初のノードに .first、最後に .last -->
+<figure><div class="fig">
+<div class="diff">
+  <div class="hd">経路</div><div class="hd ok">＋ ある（済）</div><div class="hd ng">− 無い（欠）</div>
+
+  <div class="n first"><div class="box"><span class="t">クライアント（SPA）</span></div></div>
+  <div class="c ok"><div><span><code>Authorization: Bearer</code> を付けて送っている <span class="src">api/client.ts:42</span></span></div></div>
+  <div class="c ng"><span class="empty">—</span></div>
+
+  <div class="n"><div class="box hl"><span class="t">auth ミドルウェア</span><span class="m">今回つくる</span></div></div>
+  <div class="c ok"><span class="empty">—</span></div>
+  <div class="c ng">
+    <div><span>ミドルウェア自体が無い。各ハンドラが個別に session を見ている <span class="src">handlers/*.go</span></span></div>
+    <div><span>検証済みクレームをハンドラに渡す型が無い（<code>req.user</code> 未定義）</span></div>
+  </div>
+
+  <div class="n"><div class="box"><span class="t">Auth サービス</span><span class="m">発行・失効</span></div></div>
+  <div class="c ok"><div><span>発行は <code>POST /auth/token</code> で実装済み <span class="src">auth/handler.go:88</span></span></div></div>
+  <div class="c ng"><div><span>ログアウト時に <i>denylist</i> へ書く処理が無い</span></div></div>
+
+  <div class="n last"><div class="box ext"><span class="t">Redis</span><span class="m">denylist</span></div></div>
+  <div class="c ok"><div><span><i>denylist</i> 用のインスタンスは稼働中</span></div></div>
+  <div class="c ng"><div class="warn"><span>TTL の単位が <i>Auth</i> サービスは秒、<code>config.yaml</code> は ms</span></div></div>
+</div>
+</div><figcaption>右の列を上から読めば「足すもの」の一覧になる。色付きの枠が今回つくる層。</figcaption></figure>
+</section>
+
+<!-- ============================================================ 4. コンポーネント関係 -->
+<section>
+<p class="eyebrow">4</p>
+<h2>コンポーネント間の関係</h2>
+<p class="lede">既定はインライン SVG。矢印のラベルはピルで線上に載せ、主経路には番号、別系統の経路は点線にして凡例を付ける。</p>
+<!--
+  SVG の約束
+  - ノード: rect 130×56, rx 6。名前 .tt は y+24、補足 .ts は y+42（中央揃え）
+  - ノード間の隙間は 90 以上（ピルが入る幅）
+  - 矢印: path + marker-end="url(#ah)"。強調は .hl + url(#ah-acc)。別系統は .ds
+  - ピル: rect .pl 高さ 18, rx 9。幅 ≈ 日本語 11.5/文字 + 英数 6.5/文字 + 14。文字 .pt の baseline は rect の y+13。線の上に中央で置く
+  - 番号: circle .nc r=8 を矢印の根元の斜め上（根元 x+12, 線 y−19）。文字 .nt の baseline は cy+3.5
+  - 凡例: 図の下端に .ln / .ln.ds の短い線と .ts
+  - defs の marker は 1 図に 1 組。同じページに SVG を 2 つ以上置くときは id を変える（例: ah2）
+-->
+<figure><div class="fig">
+<svg class="dg" viewBox="0 0 860 345" role="img" aria-label="SPA から Gateway、ミドルウェア、ハンドラへ流れる要求と、ミドルウェアが Redis の denylist を照会する経路。ログイン時は SPA が Auth サービスを呼ぶ">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z"/></marker>
+    <marker id="ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z"/></marker>
+  </defs>
+  <rect class="grp" x="440" y="40" width="410" height="130" rx="8"/>
+  <text class="tg" x="454" y="60">API サービス</text>
+
+  <rect class="nd" x="20" y="90" width="130" height="56" rx="6"/>
+  <text class="tt" x="85" y="114" text-anchor="middle">クライアント</text>
+  <text class="ts" x="85" y="132" text-anchor="middle">SPA</text>
+  <rect class="nd" x="240" y="90" width="130" height="56" rx="6"/>
+  <text class="tt" x="305" y="114" text-anchor="middle">API Gateway</text>
+  <text class="ts" x="305" y="132" text-anchor="middle">/api/* を転送</text>
+  <rect class="nd hl" x="460" y="90" width="130" height="56" rx="6"/>
+  <text class="tt" x="525" y="114" text-anchor="middle">ミドルウェア</text>
+  <text class="ts" x="525" y="132" text-anchor="middle">今回つくる</text>
+  <rect class="nd" x="700" y="90" width="130" height="56" rx="6"/>
+  <text class="tt" x="765" y="114" text-anchor="middle">ハンドラ</text>
+  <text class="ts" x="765" y="132" text-anchor="middle">req.user を読む</text>
+  <rect class="nd" x="20" y="250" width="130" height="56" rx="6"/>
+  <text class="tt" x="85" y="274" text-anchor="middle">Postgres</text>
+  <text class="ts" x="85" y="292" text-anchor="middle">refresh_token</text>
+  <rect class="nd" x="240" y="250" width="130" height="56" rx="6"/>
+  <text class="tt" x="305" y="274" text-anchor="middle">Auth サービス</text>
+  <text class="ts" x="305" y="292" text-anchor="middle">発行・失効</text>
+  <rect class="nd" x="460" y="250" width="130" height="56" rx="6"/>
+  <text class="tt" x="525" y="274" text-anchor="middle">Redis</text>
+  <text class="ts" x="525" y="292" text-anchor="middle">denylist:{jti}</text>
+
+  <!-- 毎リクエスト（実線・番号） -->
+  <path class="ln" d="M150 118 H240" marker-end="url(#ah)"/>
+  <rect class="pl" x="155" y="109" width="80" height="18" rx="9"/><text class="pt" x="195" y="122" text-anchor="middle">Bearer JWT</text>
+  <circle class="nc" cx="162" cy="99" r="8"/><text class="nt" x="162" y="102.5" text-anchor="middle">1</text>
+  <path class="ln" d="M370 118 H460" marker-end="url(#ah)"/>
+  <rect class="pl" x="395" y="109" width="40" height="18" rx="9"/><text class="pt" x="415" y="122" text-anchor="middle">転送</text>
+  <circle class="nc" cx="382" cy="99" r="8"/><text class="nt" x="382" y="102.5" text-anchor="middle">2</text>
+  <path class="ln hl" d="M525 146 V250" marker-end="url(#ah-acc)"/>
+  <rect class="pl hl" x="534" y="189" width="125" height="18" rx="9"/><text class="pt hl" x="541" y="202">GET denylist:{jti}</text>
+  <circle class="nc" cx="541" cy="160" r="8"/><text class="nt" x="541" y="163.5" text-anchor="middle">3</text>
+  <path class="ln hl" d="M590 118 H700" marker-end="url(#ah-acc)"/>
+  <rect class="pl hl" x="617" y="109" width="56" height="18" rx="9"/><text class="pt hl" x="645" y="122" text-anchor="middle">claims</text>
+  <circle class="nc" cx="602" cy="99" r="8"/><text class="nt" x="602" y="102.5" text-anchor="middle">4</text>
+
+  <!-- ログイン / ログアウト時（点線） -->
+  <path class="ln ds" d="M85 146 V215 H305 V250" marker-end="url(#ah)"/>
+  <rect class="pl" x="136" y="206" width="118" height="18" rx="9"/><text class="pt" x="195" y="219" text-anchor="middle">POST /auth/token</text>
+  <path class="ln ds" d="M240 278 H150" marker-end="url(#ah)"/>
+  <rect class="pl" x="175" y="269" width="40" height="18" rx="9"/><text class="pt" x="195" y="282" text-anchor="middle">保存</text>
+  <path class="ln ds" d="M370 278 H460" marker-end="url(#ah)"/>
+  <rect class="pl" x="397" y="269" width="36" height="18" rx="9"/><text class="pt" x="415" y="282" text-anchor="middle">SET</text>
+  <text class="ts" x="415" y="304" text-anchor="middle">ログアウト時</text>
+
+  <!-- 凡例 -->
+  <path class="ln" d="M20 330 H50"/><text class="ts" x="58" y="334">毎リクエスト（番号は順序）</text>
+  <path class="ln ds" d="M230 330 H260"/><text class="ts" x="268" y="334">ログイン / ログアウト時</text>
+</svg>
+</div><figcaption>強調色の線が今回つくるミドルウェアの入出力。点線の枠が同じプロセス。番号は処理の流れと同じ順。</figcaption></figure>
+
+<h3>ノードが 9 個以上、層構造が主題のとき: レーン</h3>
+<!-- 列数は .lanes（4 列）/ .lanes.n3。接続は箱の中に .edge で「→ 相手: 何を」 -->
+<figure><div class="fig">
+<div class="lanes">
+  <div class="lane"><h4>クライアント</h4>
+    <div class="box"><span class="t">SPA</span><span class="m"><span class="edge">→ <b>Gateway</b>: Bearer JWT</span><span class="edge">→ <b>Auth</b>: POST /auth/token</span></span></div></div>
+  <div class="lane"><h4>入口</h4>
+    <div class="box"><span class="t">API Gateway</span><span class="m"><span class="edge">→ <b>ミドルウェア</b>: /api/* を転送</span></span></div></div>
+  <div class="lane"><h4>API サービス</h4>
+    <div class="box hl"><span class="t">ミドルウェア</span><span class="m"><span class="edge">→ <b>Redis</b>: GET denylist:{jti}</span><span class="edge">→ <b>ハンドラ</b>: claims</span></span></div>
+    <div class="box"><span class="t">ハンドラ</span><span class="m"><span class="edge">req.user を読む</span></span></div></div>
+  <div class="lane"><h4>認証・ストレージ</h4>
+    <div class="box"><span class="t">Auth サービス</span><span class="m"><span class="edge">→ <b>Postgres</b>: refresh_token 保存</span><span class="edge">→ <b>Redis</b>: SET（ログアウト時）</span></span></div>
+    <div class="box"><span class="t">Redis</span></div>
+    <div class="box"><span class="t">Postgres</span></div></div>
+</div>
+</div><figcaption>列が層。接続は各箱の中に「→ 相手: 何を」で書く。</figcaption></figure>
+</section>
+
+<!-- ============================================================ 5. 状態遷移 -->
+<section>
+<p class="eyebrow">5</p>
+<h2>状態遷移</h2>
+<p class="lede">常に図＋表のセット。遷移番号で対応付け、条件と副作用は表にだけ書く。状態が 6 個以上なら図を省いて表だけ。</p>
+<!-- 状態は rect 140×50, rx 25（丸端）。終端は .term を 5px 内側にもう 1 枚重ねて二重枠。開始点は .dot -->
+<figure><div class="fig">
+<svg class="dg" viewBox="0 0 760 262" role="img" aria-label="トークンが発行済み、有効、期限切れ、無効化の 4 状態を移る図。遷移は 4 本で番号付き">
+  <defs>
+    <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+  </defs>
+  <circle class="dot" cx="22" cy="65" r="6"/>
+  <path class="ln" d="M28 65 H60" marker-end="url(#ah2)"/>
+  <rect class="nd" x="60" y="40" width="140" height="50" rx="25"/>
+  <text class="tt" x="130" y="70" text-anchor="middle">発行済み</text>
+  <rect class="nd hl" x="310" y="40" width="140" height="50" rx="25"/>
+  <text class="tt" x="380" y="70" text-anchor="middle">有効</text>
+  <rect class="nd" x="560" y="40" width="140" height="50" rx="25"/>
+  <text class="tt" x="630" y="70" text-anchor="middle">期限切れ</text>
+  <rect class="nd term" x="310" y="170" width="140" height="50" rx="25"/>
+  <rect class="nd term" x="315" y="175" width="130" height="40" rx="20"/>
+  <text class="tt" x="380" y="200" text-anchor="middle">無効化</text>
+
+  <path class="ln" d="M200 65 H310" marker-end="url(#ah2)"/>
+  <rect class="pl" x="217" y="56" width="76" height="18" rx="9"/><text class="pt" x="255" y="69" text-anchor="middle">初回検証 OK</text>
+  <circle class="nc" cx="208" cy="46" r="8"/><text class="nt" x="208" y="49.5" text-anchor="middle">1</text>
+  <path class="ln" d="M450 65 H560" marker-end="url(#ah2)"/>
+  <rect class="pl" x="475" y="56" width="60" height="18" rx="9"/><text class="pt" x="505" y="69" text-anchor="middle">exp 到達</text>
+  <circle class="nc" cx="458" cy="46" r="8"/><text class="nt" x="458" y="49.5" text-anchor="middle">2</text>
+  <path class="ln" d="M380 90 V170" marker-end="url(#ah2)"/>
+  <rect class="pl" x="388" y="121" width="72" height="18" rx="9"/><text class="pt" x="424" y="134" text-anchor="middle">ログアウト</text>
+  <circle class="nc" cx="392" cy="102" r="8"/><text class="nt" x="392" y="105.5" text-anchor="middle">3</text>
+  <path class="ln" d="M630 90 V240 H130 V90" marker-end="url(#ah2)"/>
+  <rect class="pl" x="297" y="231" width="166" height="18" rx="9"/><text class="pt" x="380" y="244" text-anchor="middle">refresh token で再発行</text>
+  <circle class="nc" cx="642" cy="102" r="8"/><text class="nt" x="642" y="105.5" text-anchor="middle">4</text>
+</svg>
+<div class="tblwrap" style="margin-top:.9rem"><table class="tbl">
+<thead><tr><th>#</th><th>現在</th><th>イベント</th><th>次の状態</th><th>条件・副作用</th></tr></thead>
+<tbody>
+<tr><td class="num"><span class="b">1</span></td><td class="c">発行済み</td><td>初回検証 OK</td><td class="c">有効</td><td>署名一致かつ <code>exp</code> 未到達</td></tr>
+<tr><td class="num"><span class="b">2</span></td><td class="c">有効</td><td><code>exp</code> 到達</td><td class="c">期限切れ</td><td><i>Redis</i> は触らない</td></tr>
+<tr><td class="num"><span class="b">3</span></td><td class="c">有効</td><td>ログアウト</td><td class="c">無効化</td><td><code>denylist:{jti}</code> を TTL = 残り秒数で SET</td></tr>
+<tr><td class="num"><span class="b">4</span></td><td class="c">期限切れ</td><td>refresh</td><td class="c">発行済み</td><td>refresh_token が <i>Postgres</i> にあること。新しい <code>jti</code> を採番</td></tr>
+<tr><td class="num">—</td><td class="c">無効化</td><td>—</td><td class="c">—</td><td>終端（二重枠）。再発行不可</td></tr>
+</tbody></table></div>
+</div><figcaption>「有効」だけが検証を通る。無効化は終端で、期限切れだけが再発行に戻れる。番号は図と表で共通。</figcaption></figure>
+</section>
+
+<!-- ============================================================ 6. データの形 -->
+<section>
+<p class="eyebrow">6</p>
+<h2>データの形</h2>
+<p class="lede">既定は例つきの木。1 行目に対象の一言、2 行目に列見出し（名前 / 型 / 例 / 説明）。入れ子が無く説明が長いときだけ表（見出しは 項目 / 型 / 例 / 説明）。</p>
+<figure><div class="fig">
+<pre class="tree"><span class="hd">JWT の payload（トークン本体、署名の対象）</span>
+<span class="hd">名前       型         例                  説明</span>
+payload
+├─ sub     <span class="ty">string</span>     <span class="ex">"3f1c-…"</span>           <span class="no">ユーザー ID（UUID）</span>
+├─ jti     <span class="ty">string</span>     <span class="ex">"01J7…"</span>            <span class="no">トークン ID。denylist のキー</span>
+├─ exp     <span class="ty">number</span>     <span class="ex">1756858500</span>         <span class="no">失効時刻。iat + 900</span>
+├─ scope   <span class="ty">string[]</span>   <span class="ex">["order:read"]</span>     <span class="no">権限。ハンドラが参照</span>
+└─ ctx     <span class="ty">object</span>                        <span class="no">発行時の状況</span>
+   ├─ ip   <span class="ty">string</span>     <span class="ex">"203.0.113.4"</span>
+   └─ ua   <span class="ty">string</span>     <span class="ex">"Mobile Safari"</span></pre>
+</div></figure>
+
+<h3>入れ子が無く説明が長いとき: 表</h3>
+<figure><div class="fig">
+<div class="tblwrap"><table class="tbl">
+<thead><tr><th>項目</th><th>型</th><th>例</th><th>説明</th></tr></thead>
+<tbody>
+<tr><td class="c"><code>sub</code></td><td class="c">string</td><td><code>"3f1c-…"</code></td><td>ユーザー ID（UUID）</td></tr>
+<tr><td class="c"><code>jti</code></td><td class="c">string</td><td><code>"01J7…"</code></td><td>トークン ID。<i>denylist</i> のキー</td></tr>
+<tr><td class="c"><code>exp</code></td><td class="c">number</td><td>1756858500</td><td>失効時刻。<code>iat</code> + 900</td></tr>
+</tbody></table></div>
+</div><figcaption>JWT の payload（トークン本体）に入る項目。</figcaption></figure>
+</section>
+
+</div>
+</body>
+</html>

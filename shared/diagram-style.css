@@ -1,0 +1,179 @@
+/* shared/diagram-style.css — grill 系スキルが書き出す図解 HTML の共通スタイル
+   使い方: 生成する HTML の <style> にこのファイルの中身をそのまま貼る（外部参照はしない）。
+   部品の見本と雛形は shared/diagram-kit.html、使い分けの規則は shared/diagram-preview.md。
+   この 3 つは揃えて直す。 */
+
+/* ===== トークン（色・文字・幅はここでだけ決める） ===== */
+:root{
+  --fs:15px;                 /* 本文サイズ */
+  --measure:880px;           /* 本文と図の最大幅 */
+  --bg:#F5F7FA; --surface:#FFFFFF;
+  --ink:#1A1F2B; --muted:#5E6878;
+  --line:#D6DCE6; --line-strong:#98A3B4;
+  --accent:#2B5BD7; --accent-ink:#1E44A8; --accent-soft:#E7EEFB; --on-accent:#FFFFFF; /* 今回つくる部分・論点 */
+  --ok:#1E7F4B;   --ok-soft:#E3F3E9;   /* ある・済・有効 */
+  --warn:#A8690F; --warn-soft:#FBF1DC; /* 不整合・要確認・変更 */
+  --ng:#C2352B;   --ng-soft:#FBE7E5;   /* 無い・欠・失敗 */
+  --neu:#5E6878;  --neu-soft:#ECEFF3;  /* 対象外・既存 */
+  --code-bg:#EEF1F5;
+  --shadow:0 1px 2px rgba(20,30,50,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#12151B; --surface:#1A1E26;
+    --ink:#E4E8EF; --muted:#98A2B3;
+    --line:#2B313C; --line-strong:#5A6476;
+    --accent:#86A6FF; --accent-ink:#A9BFFF; --accent-soft:#1F2A45; --on-accent:#0F1420;
+    --ok:#5FCB8A;   --ok-soft:#16301F;
+    --warn:#E1A94A; --warn-soft:#33270F;
+    --ng:#F07A70;   --ng-soft:#3A1A18;
+    --neu:#98A2B3;  --neu-soft:#232934;
+    --code-bg:#232934;
+    --shadow:none;
+  }
+}
+
+/* ===== 基本 ===== */
+*{box-sizing:border-box}
+html{font-size:var(--fs)}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.8;-webkit-font-smoothing:antialiased;
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",system-ui,sans-serif}
+code,.mono,.tree{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Noto Sans Mono",monospace}
+code{font-size:.9em;background:var(--code-bg);padding:.1em .4em;border-radius:4px}
+/* 英語の書き分け: 識別子（パス・ヘッダ名・変数名・コマンド）は code、それ以外の英単語（製品名・概念名）は i */
+i{font-style:italic;font-family:-apple-system,"Helvetica Neue",system-ui,sans-serif;letter-spacing:.01em}
+a{color:var(--accent-ink)}
+.page{max-width:var(--measure);margin:0 auto;padding:1.5rem 1.5rem 6rem}
+h1{font-size:1.6rem;line-height:1.35;margin:0 0 .25rem;text-wrap:balance}
+h2{font-size:1.2rem;line-height:1.4;margin:0 0 .5rem}
+h3{font-size:1rem;margin:1.5rem 0 .4rem}
+p{margin:.5rem 0}
+ul,ol{margin:.4rem 0;padding-left:1.4rem}
+li{margin:.2rem 0}
+li::marker{color:var(--muted)}
+.meta{color:var(--muted);font-size:.9rem;margin:0 0 1.25rem}
+.meta span+span::before{content:"・";margin:0 .35em}
+section{margin-top:3rem}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.08em;color:var(--accent-ink);margin:0 0 .2rem}
+.lede{color:var(--muted);margin:0 0 1rem}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.6rem 1rem;border-radius:0 6px 6px 0;margin:1rem 0}
+.callout .h{font-weight:700;font-size:.85rem;color:var(--accent-ink);display:block}
+.src{color:var(--muted);font-size:.82rem}   /* 出典（file:line）を添えるとき */
+
+/* ===== 図版の枠 ===== */
+figure{margin:1rem 0 0}
+.fig{overflow-x:auto;padding:.25rem 0 .5rem}   /* 横に長い図はこの中で横スクロールさせ、本文幅は広げない */
+figcaption{font-size:.86rem;color:var(--muted);margin-top:.5rem;line-height:1.6}
+
+/* ===== 箱・タグ ===== */
+.box{background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:.5rem .85rem;line-height:1.5;box-shadow:var(--shadow)}
+.box .t{font-weight:700;display:block}
+.box .m{display:block;color:var(--muted);font-size:.86rem;margin-top:.15rem}
+.box.hl{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}   /* 今回つくる部分 */
+.box.ng{border-color:var(--ng);background:var(--ng-soft)}                      /* 失敗・終端 */
+.box.ext{border-style:dashed;background:transparent;box-shadow:none}           /* 外部・変更しないもの */
+.notes{list-style:none;margin:.25rem 0 0;padding:0;font-size:.8rem;color:var(--muted);line-height:1.5;overflow-wrap:anywhere}
+.notes li{padding-left:1em;text-indent:-1em;margin:0}
+.notes li::before{content:"・"}
+.tag{display:inline-block;font-size:.78rem;font-weight:700;line-height:1.5;padding:0 .5rem;border-radius:999px;vertical-align:.1em;white-space:nowrap}
+.tag.ok{color:var(--ok);background:var(--ok-soft)}
+.tag.warn{color:var(--warn);background:var(--warn-soft)}
+.tag.ng{color:var(--ng);background:var(--ng-soft)}
+.tag.neu{color:var(--neu);background:var(--neu-soft)}
+.tag.acc{color:var(--accent-ink);background:var(--accent-soft)}
+
+/* ===== 処理の流れ: 横並び（既定。5 ステップまで） ===== */
+.flowgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:3rem;row-gap:.4rem;align-items:center;min-width:48rem;counter-reset:fstep;padding:.8rem 0 .5rem .6rem}
+.flowgrid.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.flowgrid.n4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.flowgrid .step{position:relative;padding-left:.65rem;padding-right:.65rem}
+.flowgrid .step::before{counter-increment:fstep;content:counter(fstep);position:absolute;left:-.55rem;top:-.55rem;width:1.5rem;height:1.5rem;border-radius:50%;
+  background:var(--accent);color:var(--on-accent);font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px var(--bg)}
+.arw{position:absolute;left:100%;top:50%;width:3rem;height:2px;background:var(--line-strong);margin-top:-1px}   /* 次の箱への矢印。最後の箱には置かない */
+.arw::after{content:"";position:absolute;right:0;top:-5px;border:6px solid transparent;border-left:8px solid var(--line-strong);border-right:0}
+.arw[data-l]::before{content:attr(data-l);position:absolute;left:50%;top:-6px;transform:translate(-50%,-100%);font-size:.74rem;font-weight:700;color:var(--ok);background:var(--ok-soft);padding:0 .45rem;border-radius:999px;white-space:nowrap;line-height:1.5}   /* 進む条件（3 文字まで） */
+.vdrop{position:relative;justify-self:center;width:2px;height:2.6rem;background:var(--line-strong)}   /* 下へ抜ける分岐。style="grid-column:N" で列を指定 */
+.vdrop::after{content:"";position:absolute;left:-5px;bottom:-1px;border:6px solid transparent;border-top:8px solid var(--line-strong);border-bottom:0}
+.vdrop .tag{position:absolute;left:.6rem;top:.5rem}
+.flowgrid .end{justify-self:stretch;text-align:center}   /* 合流先。style="grid-column:3/5" のように列を跨ぐ */
+
+/* ===== 処理の流れ: 縦レール（6 ステップ以上、または補足が長いとき） ===== */
+.rail{list-style:none;margin:0;padding:0 0 0 2.6rem;position:relative;counter-reset:step;max-width:40rem}
+.rail::before{content:"";position:absolute;left:calc(.85rem - 1px);top:.9rem;bottom:.9rem;width:2px;background:var(--line-strong)}
+.rail>li{position:relative;padding:.35rem 0 .35rem .35rem;margin:0}
+.rail>li::before{counter-increment:step;content:counter(step);position:absolute;left:-2.6rem;top:.55rem;width:1.7rem;height:1.7rem;border-radius:50%;
+  background:var(--surface);border:2px solid var(--line-strong);font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;color:var(--ink)}
+.rail>li.hl::before{border-color:var(--accent);color:var(--accent-ink)}
+.rail .t{font-weight:700}
+.rail .m{color:var(--muted);font-size:.9rem}
+.rail .branch{margin:.35rem 0 .2rem;padding:.25rem .75rem;border-left:3px solid var(--ng);background:var(--ng-soft);font-size:.9rem;border-radius:0 4px 4px 0;line-height:1.6}
+.rail .branch.ok{border-color:var(--ok);background:var(--ok-soft)}
+
+/* ===== 差分マップ: 経路 | ＋ある | −無い ===== */
+.diff{display:grid;grid-template-columns:minmax(11rem,13rem) 1fr 1fr;column-gap:1rem;min-width:46rem;align-items:stretch}
+.diff .hd{font-size:.8rem;font-weight:700;letter-spacing:.04em;padding:.2rem .6rem .35rem;border-bottom:2px solid var(--line-strong);color:var(--muted)}
+.diff .hd.ok{color:var(--ok);border-color:var(--ok)}
+.diff .hd.ng{color:var(--ng);border-color:var(--ng)}
+.diff .n{position:relative;padding:.6rem 0;display:flex;align-items:flex-start}   /* 経路のノード。最初は .first、最後は .last */
+.diff .n .box{width:100%;position:relative;z-index:1}
+.diff .n::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--line-strong);transform:translateX(-1px)}
+.diff .n.first::before{top:50%}
+.diff .n.last::before{bottom:50%}
+.diff .c{padding:.5rem .1rem;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:.3rem;font-size:.9rem;line-height:1.55}
+.diff .c>div{display:flex;gap:.45rem;align-items:flex-start;padding:.15rem .55rem;border-radius:4px}
+.diff .c>div::before{font-family:ui-monospace,Menlo,monospace;font-weight:700;flex:0 0 auto}
+.diff .c.ok>div{background:var(--ok-soft)}
+.diff .c.ok>div::before{content:"+";color:var(--ok)}
+.diff .c.ng>div{background:var(--ng-soft)}
+.diff .c.ng>div::before{content:"−";color:var(--ng)}
+.diff .c>div.warn{background:var(--warn-soft)}          /* 不整合は右列に ! で置く */
+.diff .c>div.warn::before{content:"!";color:var(--warn)}
+.diff .c .empty{color:var(--muted);font-size:.82rem;padding:.15rem .55rem}   /* 該当なしは — */
+
+/* ===== コンポーネント関係: レーン（ノード 9 個以上、層構造が主題のとき） ===== */
+.lanes{display:grid;grid-template-columns:repeat(4,minmax(11rem,1fr));gap:1rem;min-width:50rem}
+.lanes.n3{grid-template-columns:repeat(3,minmax(11rem,1fr));min-width:38rem}
+.lane{border-top:2px solid var(--line-strong);padding-top:.5rem}
+.lane h4{margin:0 0 .6rem;font-size:.8rem;color:var(--muted);letter-spacing:.06em;font-weight:700}
+.lane .box+.box{margin-top:.6rem}
+.edge{display:block;font-size:.8rem;color:var(--muted);line-height:1.5}   /* 「→ 相手: 何を」 */
+.edge b{color:var(--ink);font-weight:600}
+
+/* ===== 表 ===== */
+.tblwrap{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+table.tbl{border-collapse:collapse;width:100%;font-size:.93rem;font-variant-numeric:tabular-nums}
+.tbl th{text-align:left;font-weight:700;font-size:.82rem;color:var(--muted);padding:.5rem .8rem;border-bottom:2px solid var(--line-strong);background:var(--neu-soft);white-space:nowrap}
+.tbl td{padding:.5rem .8rem;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.c{white-space:nowrap}
+.tbl td.num{text-align:center;font-weight:700;color:var(--accent-ink);width:2.5rem}
+.num .b{display:inline-flex;width:1.35rem;height:1.35rem;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:.75rem;align-items:center;justify-content:center;line-height:1}   /* 図の番号と対応させる */
+
+/* ===== データの形: 木 ===== */
+.tree{font-size:.9rem;line-height:1.75;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:.75rem 1rem;overflow-x:auto;margin:0;color:var(--ink)}
+.tree .hd{color:var(--muted);font-weight:700}   /* 対象の一言と列見出し */
+.tree .ty{color:var(--accent-ink)}              /* 型 */
+.tree .ex{color:var(--ink)}                     /* 例 */
+.tree .no{color:var(--muted)}                   /* 説明 */
+
+/* ===== インライン SVG（コンポーネント関係・状態遷移） ===== */
+svg.dg{display:block;max-width:100%;height:auto;color:var(--line-strong);font-family:inherit}
+.dg .nd{fill:var(--surface);stroke:var(--line-strong);stroke-width:1.5}   /* ノード */
+.dg .nd.hl{stroke:var(--accent);stroke-width:2.5}                          /* 今回つくる部分 */
+.dg .nd.term{fill:var(--neu-soft)}                                         /* 終端状態（二重枠にする） */
+.dg .grp{fill:none;stroke:var(--line-strong);stroke-dasharray:5 4;stroke-width:1.2}   /* 同じプロセス・境界 */
+.dg .ln{fill:none;stroke:currentColor;stroke-width:1.8}                    /* 矢印。marker-end="url(#ah)" */
+.dg .ln.hl{stroke:var(--accent)}                                           /* marker-end="url(#ah-acc)" と組む */
+.dg .ln.ds{stroke-dasharray:6 4}                                           /* 別系統の経路。凡例を付ける */
+.dg .tt{fill:var(--ink);font-size:14px;font-weight:700}                    /* ノード名 */
+.dg .ts{fill:var(--muted);font-size:11.5px}                                /* ノードの補足・凡例 */
+.dg .tg{fill:var(--muted);font-size:11px;font-weight:700;letter-spacing:.05em}   /* グループ名 */
+.dg .dot{fill:var(--ink)}                                                  /* 開始点 */
+.dg .pl{fill:var(--surface);stroke:var(--line-strong);stroke-width:1}      /* 矢印ラベルのピル（高さ 18, rx 9） */
+.dg .pl.hl{stroke:var(--accent)}
+.dg .pt{fill:var(--ink);font-size:11.5px}                                  /* ピルの文字（baseline は rect の y+13） */
+.dg .pt.hl{fill:var(--accent-ink);font-weight:700}
+.dg .nc{fill:var(--accent)}                                                /* 矢印の番号（r=8） */
+.dg .nt{fill:var(--on-accent);font-size:10.5px;font-weight:700}            /* 番号の文字（baseline は cy+3.5） */
+#ah path{fill:currentColor}
+#ah-acc path{fill:var(--accent)}
