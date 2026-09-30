@@ -1,6 +1,6 @@
 # 成果物の Vault 保存フック：共通方針
 
-grill 系スキル（`grill-me` / `grill-you` / `grill-product`）が成果物を確定させた後、
+grill 系スキル（`grill-me` / `grill-you` / `grill-product` / `grill-design`）が成果物を確定させた後、
 Obsidian Vault への保存を提案するときの共通の約束。各スキルの SKILL.md はここを 1 行で参照し、
 スキル固有の「いつ・何を」だけを自分側に書く。**方針を変えるときはこのファイルだけを直す。**
 

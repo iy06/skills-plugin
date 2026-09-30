@@ -1,6 +1,6 @@
 # 図の出し方：HTML ファイルを書き出してブラウザでプレビュー
 
-grill 系スキル（`grill-me` / `grill-you` / `grill-product` / `grill-loop`）が図を見せるときの共通手順と、
+grill 系スキル（`grill-me` / `grill-you` / `grill-product` / `grill-design` / `grill-loop`）が図を見せるときの共通手順と、
 図解 HTML のデザインの決まり。各スキルの SKILL.md はここを参照する。
 
 同じ方針を担うファイルが 3 つある。**変えるときは 3 つを揃えて直す。**

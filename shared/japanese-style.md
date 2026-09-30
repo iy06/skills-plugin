@@ -1,6 +1,6 @@
 # 日本語の文体：natural-japanese スキルに委ねる
 
-grill 系スキル（`grill-me` / `grill-you` / `grill-product` / `grill-loop`）が散文の成果物を
+grill 系スキル（`grill-me` / `grill-you` / `grill-product` / `grill-design` / `grill-loop`）が散文の成果物を
 書き上げるときの共通手順。各スキルの SKILL.md はここを参照する。
 **この方針を変えるときはこのファイルだけを直す。**
 
