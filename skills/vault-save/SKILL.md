@@ -1,6 +1,6 @@
 ---
 name: vault-save
-description: 確定した成果物を Obsidian Vault に Markdown として保存する専任スキル。~/.claude/vaults.json の定義を読み、成果物の種別から保存先の Vault とフォルダを決めて書き出す。既定は個人 Vault で、共有リポジトリ側は明示指定か承認があるときだけ使う。grill 系スキルの保存フックから呼ばれるほか、単体でも使える。成果物そのものを作るのは grill-product / grill-me / grill-you が担当する。
+description: 確定した成果物を Obsidian Vault に Markdown として保存する専任スキル。~/.claude/vaults.json の定義を読み、成果物の種別から保存先の Vault とフォルダを決めて書き出す。既定は個人 Vault で、共有リポジトリ側は明示指定か承認があるときだけ使う。grill 系スキルの保存フックから呼ばれるほか、単体でも使える。成果物そのものを作るのは grill-product / grill-design / grill-me / grill-you が担当する。
 ---
 
 # vault-save
